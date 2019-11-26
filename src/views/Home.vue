@@ -20,6 +20,8 @@
         </a-select-option>
       </a-select>
     </div>
+
+    <input type="file" @change="JimpFile($event)">
     <img src="./logo.png" alt="" />
   </div>
 </template>
@@ -38,6 +40,37 @@ export default {
     };
   },
   methods: {
+    JimpFile(event){
+      let that=this;
+     let oFile = event.target.files[0];
+      var fileReader = new FileReader();
+      fileReader.readAsDataURL(oFile);
+
+      fileReader.onload = function (e) {
+        var data = e.target.result;
+        //加载图片获取图片真实宽度和高度
+        var image = new Image();
+
+        image.onload = function () {
+          let srcBase64 = image.src
+          let bufferData = that.base64ToUint8Array(srcBase64.split(",")[1]);
+
+          console.log(bufferData)
+          // Jimp.read(require('./logo.png'))
+          Jimp.read(bufferData)
+                  .then(image => {
+                    console.log(image);
+                  })
+                  .catch(err => {
+                    console.log(err);
+
+                  });
+
+
+        };
+        image.src = data;
+      };
+    },
     base64ToUint8Array(base64String) {
       const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
         const base64 = (base64String + padding)
